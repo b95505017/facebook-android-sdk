@@ -62,13 +62,11 @@ import com.facebook.internal.PlatformServiceClient
 import com.facebook.internal.ServerProtocol
 import com.facebook.internal.Utility
 import com.facebook.internal.Validate.sdkInitialized
+import com.facebook.internal.resolveActivityCompat
 import com.facebook.login.LoginMethodHandler.Companion.getUserIDFromSignedRequest
 import com.facebook.login.PKCEUtil.generateCodeChallenge
-import java.lang.Exception
 import java.util.Date
 import java.util.UUID
-import kotlin.jvm.JvmOverloads
-import kotlin.jvm.Volatile
 
 /** This class manages login and permissions for Facebook. */
 open class LoginManager internal constructor() {
@@ -837,8 +835,8 @@ open class LoginManager internal constructor() {
       var callbackManager: CallbackManager? = null,
       var loggerID: String? = null
   ) : ActivityResultContract<Collection<String>, CallbackManager.ActivityResultParameters>() {
-    override fun createIntent(context: Context, permissions: Collection<String>): Intent {
-      val loginConfig = LoginConfiguration(permissions)
+    override fun createIntent(context: Context, input: Collection<String>): Intent {
+      val loginConfig = LoginConfiguration(input)
       val loginRequest = createLoginRequestWithConfig(loginConfig)
       loggerID?.let { loginRequest.authId = it }
       logStartLogin(context, loginRequest)
@@ -1084,7 +1082,7 @@ open class LoginManager internal constructor() {
   }
 
   private fun resolveIntent(intent: Intent): Boolean {
-    val resolveInfo = getApplicationContext().packageManager.resolveActivity(intent, 0)
+    val resolveInfo = getApplicationContext().packageManager.resolveActivityCompat(intent, 0)
     return resolveInfo != null
   }
 

@@ -259,7 +259,7 @@ object NativeProtocol {
     if (intent == null) {
       return null
     }
-    val resolveInfo = context.packageManager.resolveActivity(intent, 0) ?: return null
+    val resolveInfo = context.packageManager.resolveActivityCompat(intent, 0) ?: return null
     return if (!validateSignature(context, resolveInfo.activityInfo.packageName)) {
       null
     } else intent
@@ -270,7 +270,7 @@ object NativeProtocol {
     if (intent == null) {
       return null
     }
-    val resolveInfo = context.packageManager.resolveService(intent, 0) ?: return null
+    val resolveInfo = context.packageManager.resolveServiceCompat(intent, 0) ?: return null
     return if (!validateSignature(context, resolveInfo.serviceInfo.packageName)) {
       null
     } else intent
@@ -588,7 +588,7 @@ object NativeProtocol {
     if (callIdString != null) {
       try {
         callId = UUID.fromString(callIdString)
-      } catch (exception: IllegalArgumentException) {}
+      } catch (_: IllegalArgumentException) {}
     }
     return callId
   }
@@ -739,7 +739,7 @@ object NativeProtocol {
       val contentProviderName = appInfo.getPackage() + PLATFORM_PROVIDER
       var providerInfo: ProviderInfo? = null
       try {
-        providerInfo = pm.resolveContentProvider(contentProviderName, 0)
+        providerInfo = pm.resolveContentProviderCompat(contentProviderName, 0)
       } catch (e: RuntimeException) {
         // Accessing a dead provider will cause an DeadObjectException in the
         // package manager. It will be thrown as a Runtime Exception.

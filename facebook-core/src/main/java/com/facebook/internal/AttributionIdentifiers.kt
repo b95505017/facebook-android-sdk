@@ -193,9 +193,9 @@ class AttributionIdentifiers {
             arrayOf(ATTRIBUTION_ID_COLUMN_NAME, ANDROID_ID_COLUMN_NAME, LIMIT_TRACKING_COLUMN_NAME)
         var providerUri: Uri? = null
         val contentProviderInfo =
-            context.packageManager.resolveContentProvider(ATTRIBUTION_ID_CONTENT_PROVIDER, 0)
+            context.packageManager.resolveContentProviderCompat(ATTRIBUTION_ID_CONTENT_PROVIDER, 0)
         val wakizashiProviderInfo =
-            context.packageManager.resolveContentProvider(
+            context.packageManager.resolveContentProviderCompat(
                 ATTRIBUTION_ID_CONTENT_PROVIDER_WAKIZASHI, 0)
         if (contentProviderInfo != null &&
             validateSignature(context, contentProviderInfo.packageName)) {

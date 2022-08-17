@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Base64
 import androidx.annotation.VisibleForTesting
+import com.facebook.internal.getSignaturesCompat
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -22,8 +23,7 @@ object CertificateUtil {
     try {
       val signatures =
           ctx.packageManager
-              .getPackageInfo(ctx.packageName, PackageManager.GET_SIGNATURES)
-              .signatures
+              .getSignaturesCompat(ctx.packageName)
       val sb = StringBuilder()
       val md = MessageDigest.getInstance("SHA1")
       for (signature in signatures) {

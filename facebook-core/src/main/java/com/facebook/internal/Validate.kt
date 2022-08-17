@@ -223,7 +223,7 @@ object Validate {
       intent.addCategory(Intent.CATEGORY_DEFAULT)
       intent.addCategory(Intent.CATEGORY_BROWSABLE)
       intent.data = Uri.parse(redirectURI)
-      infos = pm.queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER)
+      infos = pm.queryIntentActivitiesCompat(intent, PackageManager.GET_RESOLVED_FILTER)
     }
     var hasActivity = false
     if (infos != null) {
@@ -248,7 +248,7 @@ object Validate {
     val pm = context.packageManager
     if (pm != null) {
       val providerName = CONTENT_PROVIDER_BASE + appId
-      checkNotNull(pm.resolveContentProvider(providerName, 0)) {
+      checkNotNull(pm.resolveContentProviderCompat(providerName, 0)) {
         String.format(CONTENT_PROVIDER_NOT_FOUND_REASON, providerName)
       }
     }

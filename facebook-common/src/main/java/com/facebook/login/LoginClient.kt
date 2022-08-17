@@ -28,7 +28,6 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.text.TextUtils
 import androidx.annotation.RestrictTo
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.facebook.AccessToken
 import com.facebook.AuthenticationToken
@@ -41,17 +40,15 @@ import com.facebook.internal.CallbackManagerImpl
 import com.facebook.internal.Utility.readNonnullStringMapFromParcel
 import com.facebook.internal.Utility.writeNonnullStringMapToParcel
 import com.facebook.internal.Validate
-import java.lang.Exception
-import java.util.UUID
-import kotlin.jvm.JvmOverloads
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.UUID
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 open class LoginClient : Parcelable {
   var handlersToTry: Array<LoginMethodHandler>? = null
   private var currentHandler = -1
-  var fragment: Fragment? = null
+  var fragment: LoginFragment? = null
     set(value) {
       if (field != null) {
         throw FacebookException("Can't set fragment once it is already set.")
@@ -77,7 +74,7 @@ open class LoginClient : Parcelable {
     fun onBackgroundProcessingStopped()
   }
 
-  constructor(fragment: Fragment) {
+  constructor(fragment: LoginFragment) {
     this.fragment = fragment
   }
 
@@ -126,7 +123,7 @@ open class LoginClient : Parcelable {
     currentHandler = index
   }
 
-  fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+  fun onActivityResult(resultCode: Int, data: Intent?): Boolean {
     numActivitiesReturned++
     if (pendingRequest != null) {
       if (data != null) {
@@ -144,7 +141,7 @@ open class LoginClient : Parcelable {
           (!currentHandler.shouldKeepTrackOfMultipleIntents() ||
               data != null ||
               numActivitiesReturned >= numTotalIntentsFired)) {
-        return currentHandler.onActivityResult(requestCode, resultCode, data)
+        return currentHandler.onActivityResult(resultCode, data)
       }
     }
     return false

@@ -27,6 +27,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.facebook.common.R
@@ -44,6 +45,14 @@ open class LoginFragment : Fragment() {
   private var request: LoginClient.Request? = null
 
   private lateinit var progressBar: View
+
+  private val startActivityForResultHandler = registerForActivityResult(StartActivityForResult()) {
+    with(it) {
+      loginClient.onActivityResult(resultCode, data)
+    }
+  }
+
+  fun startActivityForResult(intent: Intent) = startActivityForResultHandler.launch(intent)
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -139,11 +148,6 @@ open class LoginFragment : Fragment() {
     if (progressBar != null) {
       progressBar.visibility = View.GONE
     }
-  }
-
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    loginClient.onActivityResult(requestCode, resultCode, data)
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

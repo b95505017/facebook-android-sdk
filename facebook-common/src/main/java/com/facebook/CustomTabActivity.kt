@@ -20,35 +20,23 @@
 
 package com.facebook
 
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.fragment.app.FragmentActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 /*
  * Login from a custom tab redirects here. Pass the url on to CustomTabMainActivity so it can return
  * the result.
  */
-class CustomTabActivity : Activity() {
+class CustomTabActivity : FragmentActivity() {
   private var closeReceiver: BroadcastReceiver? = null
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    val intent = Intent(this, CustomTabMainActivity::class.java)
-    intent.action = CUSTOM_TAB_REDIRECT_ACTION
-    intent.putExtra(CustomTabMainActivity.EXTRA_URL, getIntent().dataString)
-
-    // these flags will open CustomTabMainActivity from the back stack as well as closing this
-    // activity and the custom tab opened by CustomTabMainActivity.
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-    startActivityForResult(intent, CUSTOM_TAB_REDIRECT_REQUEST_CODE)
-  }
-
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    if (resultCode == RESULT_CANCELED) {
+  private val handler = registerForActivityResult(StartActivityForResult()) {
+    if (it.resultCode == RESULT_CANCELED) {
       // We weren't able to open CustomTabMainActivity from the back stack. Send a broadcast
       // instead.
       val broadcast = Intent(CUSTOM_TAB_REDIRECT_ACTION)
@@ -57,15 +45,27 @@ class CustomTabActivity : Activity() {
 
       // Wait for the custom tab to be removed from the back stack before finishing.
       val closeReceiver =
-          object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-              finish()
-            }
+        object : BroadcastReceiver() {
+          override fun onReceive(context: Context, intent: Intent) {
+            finish()
           }
+        }
       LocalBroadcastManager.getInstance(this)
-          .registerReceiver(closeReceiver, IntentFilter(DESTROY_ACTION))
+        .registerReceiver(closeReceiver, IntentFilter(DESTROY_ACTION))
       this.closeReceiver = closeReceiver
     }
+  }
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    handler.launch(Intent(this, CustomTabMainActivity::class.java).apply {
+      action = CUSTOM_TAB_REDIRECT_ACTION
+      putExtra(CustomTabMainActivity.EXTRA_URL, intent.dataString)
+
+      // these flags will open CustomTabMainActivity from the back stack as well as closing this
+      // activity and the custom tab opened by CustomTabMainActivity.
+      addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    })
   }
 
   override fun onDestroy() {
@@ -74,8 +74,6 @@ class CustomTabActivity : Activity() {
   }
 
   companion object {
-    private const val CUSTOM_TAB_REDIRECT_REQUEST_CODE = 2
-
     @JvmField
     val CUSTOM_TAB_REDIRECT_ACTION =
         CustomTabActivity::class.java.simpleName + ".action_customTabRedirect"

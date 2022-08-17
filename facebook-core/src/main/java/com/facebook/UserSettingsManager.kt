@@ -31,10 +31,11 @@ import com.facebook.internal.AttributionIdentifiers.Companion.getAttributionIden
 import com.facebook.internal.FetchedAppSettingsManager.queryAppSettings
 import com.facebook.internal.Utility.isAutoAppLinkSetup
 import com.facebook.internal.Utility.logd
+import com.facebook.internal.getApplicationInfoCompat
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
-import java.util.concurrent.atomic.AtomicBoolean
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.concurrent.atomic.AtomicBoolean
 
 @AutoHandleExceptions
 internal object UserSettingsManager {
@@ -198,7 +199,7 @@ internal object UserSettingsManager {
     validateInitialized()
     try {
       val ctx = FacebookSdk.getApplicationContext()
-      val ai = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
+      val ai = ctx.packageManager.getApplicationInfoCompat(ctx.packageName, PackageManager.GET_META_DATA)
       if (ai?.metaData != null && ai.metaData.containsKey(userSetting.key)) {
         // default value should not be used
         userSetting.value = ai.metaData.getBoolean(userSetting.key, userSetting.defaultVal)
@@ -211,7 +212,7 @@ internal object UserSettingsManager {
   private fun logWarnings() {
     try {
       val ctx = FacebookSdk.getApplicationContext()
-      val ai = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
+      val ai = ctx.packageManager.getApplicationInfoCompat(ctx.packageName, PackageManager.GET_META_DATA)
       if (ai?.metaData != null) {
         // Log warnings for App Event Flags
         if (!ai.metaData.containsKey(FacebookSdk.AUTO_LOG_APP_EVENTS_ENABLED_PROPERTY)) {
@@ -250,7 +251,7 @@ internal object UserSettingsManager {
       var usageBitmask = 0
       try {
         val ai =
-            ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
+            ctx.packageManager.getApplicationInfoCompat(ctx.packageName, PackageManager.GET_META_DATA)
         if (ai?.metaData != null) {
           val keys =
               arrayOf(
@@ -282,7 +283,7 @@ internal object UserSettingsManager {
   fun logIfAutoAppLinkEnabled() {
     try {
       val ctx = FacebookSdk.getApplicationContext()
-      val ai = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
+      val ai = ctx.packageManager.getApplicationInfoCompat(ctx.packageName, PackageManager.GET_META_DATA)
       if (ai?.metaData != null &&
           ai.metaData.getBoolean("com.facebook.sdk.AutoAppLinkEnabled", false)) {
         val logger = InternalAppEventsLogger(ctx)

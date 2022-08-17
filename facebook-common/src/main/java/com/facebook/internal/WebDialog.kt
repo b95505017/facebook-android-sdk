@@ -81,11 +81,11 @@ import com.facebook.login.LoginTargetApp
 import com.facebook.share.internal.ShareConstants
 import com.facebook.share.internal.ShareInternalUtility
 import com.facebook.share.widget.ShareDialog
+import org.json.JSONArray
 import java.util.Locale
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CountDownLatch
 import java.util.regex.Pattern
-import org.json.JSONArray
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for
@@ -819,7 +819,7 @@ open class WebDialog : Dialog {
       }
       val ai: ApplicationInfo? =
           try {
-            context.packageManager.getApplicationInfo(
+            context.packageManager.getApplicationInfoCompat(
                 context.packageName, PackageManager.GET_META_DATA)
           } catch (e: PackageManager.NameNotFoundException) {
             return

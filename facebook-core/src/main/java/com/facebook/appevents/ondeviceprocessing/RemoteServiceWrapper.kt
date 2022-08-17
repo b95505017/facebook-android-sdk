@@ -33,6 +33,7 @@ import com.facebook.appevents.internal.AppEventUtility.assertIsNotMainThread
 import com.facebook.internal.FacebookSignatureValidator.validateSignature
 import com.facebook.internal.Utility.logd
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
+import com.facebook.internal.resolveServiceCompat
 import com.facebook.ppml.receiver.IReceiverService
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -128,13 +129,13 @@ object RemoteServiceWrapper {
     if (packageManager != null) {
       val serviceIntent = Intent(RECEIVER_SERVICE_ACTION)
       serviceIntent.setPackage(RECEIVER_SERVICE_PACKAGE)
-      val serviceInfo = packageManager.resolveService(serviceIntent, 0)
+      val serviceInfo = packageManager.resolveServiceCompat(serviceIntent, 0)
       if (serviceInfo != null && validateSignature(context, RECEIVER_SERVICE_PACKAGE)) {
         return serviceIntent
       } else {
         val wakizashiServiceIntent = Intent(RECEIVER_SERVICE_ACTION)
         wakizashiServiceIntent.setPackage(RECEIVER_SERVICE_PACKAGE_WAKIZASHI)
-        val wakizashiServiceInfo = packageManager.resolveService(wakizashiServiceIntent, 0)
+        val wakizashiServiceInfo = packageManager.resolveServiceCompat(wakizashiServiceIntent, 0)
         if (wakizashiServiceInfo != null &&
             validateSignature(context, RECEIVER_SERVICE_PACKAGE_WAKIZASHI)) {
           return wakizashiServiceIntent

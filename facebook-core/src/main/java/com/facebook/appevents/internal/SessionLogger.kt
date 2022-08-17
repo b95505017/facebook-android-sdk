@@ -30,6 +30,8 @@ import com.facebook.appevents.AppEventsLogger
 import com.facebook.appevents.InternalAppEventsLogger
 import com.facebook.appevents.internal.HashUtils.computeChecksum
 import com.facebook.internal.Logger.Companion.log
+import com.facebook.internal.getApplicationInfoCompat
+import com.facebook.internal.getPackageInfoCompat
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
 import com.facebook.internal.security.CertificateUtil.getCertificateHash
 import java.util.Locale
@@ -132,7 +134,7 @@ internal object SessionLogger {
     return try {
       // First, try to check if package hash already computed
       val pm = context.packageManager
-      val packageVersion = pm.getPackageInfo(context.packageName, 0).versionName
+      val packageVersion = pm.getPackageInfoCompat(context.packageName, 0).versionName
       val packageHashSharedPrefKey = PACKAGE_CHECKSUM + ";" + packageVersion
       val preferences =
           context.getSharedPreferences(FacebookSdk.APP_EVENT_PREFERENCES, Context.MODE_PRIVATE)
@@ -147,7 +149,7 @@ internal object SessionLogger {
             androidPackageManagerChecksum
           } else {
             // Finally, compute checksum and cache it.
-            val ai = pm.getApplicationInfo(context.packageName, 0)
+            val ai = pm.getApplicationInfoCompat(context.packageName, 0)
             computeChecksum(ai.sourceDir)
           }
       preferences.edit().putString(packageHashSharedPrefKey, packageHash).apply()

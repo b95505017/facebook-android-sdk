@@ -42,11 +42,10 @@ import com.facebook.internal.Utility.isNullOrEmpty
 import com.facebook.internal.Utility.readStringMapFromParcel
 import com.facebook.internal.Utility.writeStringMapToParcel
 import com.facebook.login.PKCEUtil.createCodeExchangeRequest
-import java.io.UnsupportedEncodingException
-import java.util.Date
-import kotlin.collections.HashMap
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.UnsupportedEncodingException
+import java.util.Date
 
 /**
  * This is an internal class in Facebook SDK and it should not be used directly from external code.
@@ -71,7 +70,7 @@ abstract class LoginMethodHandler : Parcelable {
   }
 
   abstract fun tryAuthorize(request: LoginClient.Request): Int
-  open fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean = false
+  open fun onActivityResult(resultCode: Int, data: Intent?): Boolean = false
 
   open fun needsInternetPermission(): Boolean = false
 

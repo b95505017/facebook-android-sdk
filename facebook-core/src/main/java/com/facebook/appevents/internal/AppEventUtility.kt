@@ -28,6 +28,7 @@ import android.view.View
 import com.facebook.FacebookSdk
 import com.facebook.core.BuildConfig
 import com.facebook.internal.Utility.currentLocale
+import com.facebook.internal.getPackageInfoCompat
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
 import java.text.NumberFormat
 import java.text.ParseException
@@ -98,7 +99,7 @@ object AppEventUtility {
   fun getAppVersion(): String {
     val context = FacebookSdk.getApplicationContext()
     return try {
-      val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+      val packageInfo = context.packageManager.getPackageInfoCompat(context.packageName, 0)
       packageInfo.versionName
     } catch (e: PackageManager.NameNotFoundException) {
       ""

@@ -25,13 +25,12 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.TextUtils
 import com.facebook.appevents.InternalAppEventsLogger
+import com.facebook.internal.getPackageInfoCompat
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
-import java.lang.Exception
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import kotlin.jvm.JvmOverloads
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 @AutoHandleExceptions
 internal class LoginLogger(context: Context, val applicationId: String) {
@@ -259,7 +258,7 @@ internal class LoginLogger(context: Context, val applicationId: String) {
     try {
       val packageManager = context.packageManager
       if (packageManager != null) {
-        val facebookInfo = packageManager.getPackageInfo(FACEBOOK_PACKAGE_NAME, 0)
+        val facebookInfo = packageManager.getPackageInfoCompat(FACEBOOK_PACKAGE_NAME, 0)
         if (facebookInfo != null) {
           facebookVersion = facebookInfo.versionName
         }

@@ -44,7 +44,6 @@ import com.facebook.internal.Utility.isNullOrEmpty
 import com.facebook.internal.Utility.parseUrlQueryString
 import com.facebook.internal.Validate
 import com.facebook.login.LoginClient.Request
-import java.lang.NumberFormatException
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -92,7 +91,7 @@ class CustomTabLoginMethodHandler : WebLoginMethodHandler {
     intent.putExtra(CustomTabMainActivity.EXTRA_PARAMS, parameters)
     intent.putExtra(CustomTabMainActivity.EXTRA_CHROME_PACKAGE, chromePackage)
     intent.putExtra(CustomTabMainActivity.EXTRA_TARGET_APP, request.loginTargetApp.toString())
-    loginClient.fragment?.startActivityForResult(intent, CUSTOM_TAB_REQUEST_CODE)
+    loginClient.fragment?.startActivityForResult(intent)
     return 1
   }
 
@@ -105,16 +104,13 @@ class CustomTabLoginMethodHandler : WebLoginMethodHandler {
       return currentPackage
     }
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+  override fun onActivityResult(resultCode: Int, data: Intent?): Boolean {
     if (data != null) {
       val hasNoBrowserException =
           data.getBooleanExtra(CustomTabMainActivity.NO_ACTIVITY_EXCEPTION, false)
       if (hasNoBrowserException) {
-        return super.onActivityResult(requestCode, resultCode, data)
+        return super.onActivityResult(resultCode, data)
       }
-    }
-    if (requestCode != CUSTOM_TAB_REQUEST_CODE) {
-      return super.onActivityResult(requestCode, resultCode, data)
     }
     val request = loginClient.pendingRequest ?: return false
     if (resultCode == Activity.RESULT_OK) {
@@ -214,7 +210,6 @@ class CustomTabLoginMethodHandler : WebLoginMethodHandler {
   }
 
   companion object {
-    private const val CUSTOM_TAB_REQUEST_CODE = 1
     private const val CHALLENGE_LENGTH = 20
     private const val API_EC_DIALOG_CANCEL = 4201
     const val OAUTH_DIALOG = "oauth"

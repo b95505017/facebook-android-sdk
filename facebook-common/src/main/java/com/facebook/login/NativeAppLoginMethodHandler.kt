@@ -22,6 +22,7 @@ package com.facebook.login
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Parcel
 import androidx.annotation.VisibleForTesting
@@ -34,7 +35,7 @@ import com.facebook.internal.ServerProtocol.getErrorConnectionFailure
 import com.facebook.internal.ServerProtocol.getErrorsProxyAuthDisabled
 import com.facebook.internal.ServerProtocol.getErrorsUserCanceled
 import com.facebook.internal.Utility.isNullOrEmpty
-import java.lang.Exception
+import com.facebook.internal.resolveActivityCompat
 
 @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
 abstract class NativeAppLoginMethodHandler : LoginMethodHandler {
@@ -75,7 +76,7 @@ abstract class NativeAppLoginMethodHandler : LoginMethodHandler {
 
   open val tokenSource: AccessTokenSource = AccessTokenSource.FACEBOOK_APPLICATION_WEB
 
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+  override fun onActivityResult(resultCode: Int, data: Intent?): Boolean {
     val request = loginClient.pendingRequest
     if (data == null) {
       // This happens if the user presses 'Back'.
@@ -178,7 +179,13 @@ abstract class NativeAppLoginMethodHandler : LoginMethodHandler {
       return false
     }
     try {
-      loginClient.fragment?.startActivityForResult(intent, requestCode)
+      loginClient.fragment?.apply {
+        context?.packageManager?.apply {
+          if (resolveActivityCompat(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+            startActivityForResult(intent)
+          } else return false
+        }
+      }
     } catch (e: Exception) {
       // We do not know if we have the activity until we try starting it.
       // FB is not installed if ActivityNotFoundException is thrown and this might fallback

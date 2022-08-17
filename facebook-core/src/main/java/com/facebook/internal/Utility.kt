@@ -41,6 +41,7 @@ import android.view.WindowManager
 import android.view.autofill.AutofillManager
 import android.webkit.CookieManager
 import android.webkit.CookieSyncManager
+import androidx.core.content.pm.PackageInfoCompat
 import com.facebook.AccessToken
 import com.facebook.FacebookException
 import com.facebook.FacebookSdk
@@ -50,6 +51,10 @@ import com.facebook.appevents.UserDataStore
 import com.facebook.internal.ProfileInformationCache.getProfileInformation
 import com.facebook.internal.ProfileInformationCache.putProfileInformation
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import org.json.JSONTokener
 import java.io.BufferedInputStream
 import java.io.Closeable
 import java.io.File
@@ -72,13 +77,6 @@ import java.util.Locale
 import java.util.Random
 import java.util.TimeZone
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-import org.json.JSONTokener
 
 /**
  * com.facebook.internal is solely for the use of other packages within the Facebook SDK for
@@ -630,7 +628,7 @@ object Utility {
     val context = FacebookSdk.getApplicationContext() ?: return null
     val pkgName = context.packageName
     try {
-      val pi = context.packageManager.getPackageInfo(pkgName, 0) ?: return null
+      val pi = context.packageManager.getPackageInfoCompat(pkgName, 0) ?: return null
       return pi.versionName
     } catch (e: PackageManager.NameNotFoundException) {
       /* no op */
@@ -647,11 +645,11 @@ object Utility {
 
     // Application Manifest info:
     val pkgName = appContext.packageName
-    var versionCode = -1
+    var versionCode = -1L
     var versionName: String? = ""
     try {
-      val pi = appContext.packageManager.getPackageInfo(pkgName, 0) ?: return
-      versionCode = pi.versionCode
+      val pi = appContext.packageManager.getPackageInfoCompat(pkgName, 0) ?: return
+      versionCode = PackageInfoCompat.getLongVersionCode(pi)
       versionName = pi.versionName
     } catch (e: PackageManager.NameNotFoundException) {
       // Swallow
@@ -1221,7 +1219,7 @@ object Utility {
         val packageManager = ctx.packageManager
         val packageName = ctx.packageName
         val activities =
-            packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            packageManager.queryIntentActivitiesCompat(intent, PackageManager.MATCH_DEFAULT_ONLY)
         for (info in activities) {
           if (packageName == info.activityInfo.packageName) {
             return true

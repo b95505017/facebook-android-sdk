@@ -28,6 +28,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
+import com.facebook.FacebookSdk.GraphRequestCreator
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.appevents.AppEventsManager
 import com.facebook.appevents.internal.ActivityLifecycleTracker.startTracking
@@ -43,8 +44,13 @@ import com.facebook.internal.NativeProtocol.updateAllAvailableProtocolVersionsAs
 import com.facebook.internal.ServerProtocol.getDefaultAPIVersion
 import com.facebook.internal.Utility
 import com.facebook.internal.Validate
+import com.facebook.internal.getApplicationInfoCompat
+import com.facebook.internal.getSignaturesCompat
 import com.facebook.internal.instrument.InstrumentManager
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.File
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -55,15 +61,7 @@ import java.util.concurrent.FutureTask
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.collections.HashSet
-import kotlin.collections.Set
-import kotlin.collections.hashSetOf
-import kotlin.collections.isEmpty
-import kotlin.collections.toList
 import kotlin.concurrent.withLock
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 
 /** This class allows some customization of Facebook SDK behavior. */
 object FacebookSdk {
@@ -735,7 +733,7 @@ object FacebookSdk {
     }
     val ai =
         try {
-          context.packageManager.getApplicationInfo(
+          context.packageManager.getApplicationInfoCompat(
               context.packageName, PackageManager.GET_META_DATA)
         } catch (e: PackageManager.NameNotFoundException) {
           return
@@ -788,14 +786,13 @@ object FacebookSdk {
     }
     val packageManager = context.packageManager ?: return null
     val packageName = context.packageName
-    val packageInfo =
+    val signatures =
         try {
-          packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+          packageManager.getSignaturesCompat(packageName)
         } catch (e: PackageManager.NameNotFoundException) {
           return null
         }
-    val signatures = packageInfo.signatures
-    if (signatures == null || signatures.isEmpty()) {
+    if (signatures.isEmpty()) {
       return null
     }
     val md =
@@ -804,7 +801,7 @@ object FacebookSdk {
         } catch (e: NoSuchAlgorithmException) {
           return null
         }
-    md.update(packageInfo.signatures[0].toByteArray())
+    md.update(signatures[0].toByteArray())
     return Base64.encodeToString(md.digest(), Base64.URL_SAFE or Base64.NO_PADDING)
   }
 

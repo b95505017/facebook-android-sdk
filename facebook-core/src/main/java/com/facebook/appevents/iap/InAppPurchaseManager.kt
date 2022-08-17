@@ -25,6 +25,7 @@ import androidx.annotation.RestrictTo
 import com.facebook.FacebookSdk.getApplicationContext
 import com.facebook.internal.FeatureManager
 import com.facebook.internal.FeatureManager.isEnabled
+import com.facebook.internal.getApplicationInfoCompat
 import com.facebook.internal.instrument.crashshield.AutoHandleExceptions
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -55,7 +56,7 @@ object InAppPurchaseManager {
     return try {
       val context = getApplicationContext()
       val info =
-          context.packageManager.getApplicationInfo(
+          context.packageManager.getApplicationInfoCompat(
               context.packageName, PackageManager.GET_META_DATA)
       if (info != null) {
         val version = info.metaData.getString(GOOGLE_BILLINGCLIENT_VERSION)
