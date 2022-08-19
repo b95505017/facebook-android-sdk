@@ -12,13 +12,14 @@ import android.content.pm.PackageManager.GET_SIGNING_CERTIFICATES
 import android.content.pm.PackageManager.PackageInfoFlags
 import android.content.pm.PackageManager.ResolveInfoFlags
 import android.content.pm.ResolveInfo
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.core.content.pm.PackageInfoCompat
-import androidx.core.os.BuildCompat
 
 fun PackageManager.resolveActivityCompat(
     intent: Intent,
     flags: Int,
-) = if (BuildCompat.isAtLeastT()) {
+) = if (SDK_INT >= TIRAMISU) {
     resolveActivity(intent, ResolveInfoFlags.of(flags.toLong()))
 } else {
     resolveActivity(intent, flags)
@@ -28,7 +29,7 @@ fun PackageManager.resolveActivityCompat(
 fun PackageManager.queryIntentActivitiesCompat(
     intent: Intent,
     flags: Int,
-): List<ResolveInfo> = if (BuildCompat.isAtLeastT()) {
+): List<ResolveInfo> = if (SDK_INT >= TIRAMISU) {
     queryIntentActivities(intent, ResolveInfoFlags.of(flags.toLong()))
 } else {
     queryIntentActivities(intent, flags)
@@ -37,7 +38,7 @@ fun PackageManager.queryIntentActivitiesCompat(
 fun PackageManager.resolveServiceCompat(
     intent: Intent,
     flags: Int,
-) = if (BuildCompat.isAtLeastT()) {
+) = if (SDK_INT >= TIRAMISU) {
     resolveService(intent, ResolveInfoFlags.of(flags.toLong()))
 } else {
     resolveService(intent, flags)
@@ -47,7 +48,7 @@ fun PackageManager.resolveServiceCompat(
 fun PackageManager.getPackageInfoCompat(
     packageName: String,
     flags: Int,
-): PackageInfo = if (BuildCompat.isAtLeastT()) {
+): PackageInfo = if (SDK_INT >= TIRAMISU) {
     getPackageInfo(packageName, PackageInfoFlags.of(flags.toLong()))
 } else {
     getPackageInfo(packageName, flags)
@@ -57,7 +58,7 @@ fun PackageManager.getPackageInfoCompat(
 fun PackageManager.getApplicationInfoCompat(
     packageName: String,
     flags: Int,
-): ApplicationInfo = if (BuildCompat.isAtLeastT()) {
+): ApplicationInfo = if (SDK_INT >= TIRAMISU) {
     getApplicationInfo(packageName, ApplicationInfoFlags.of(flags.toLong()))
 } else {
     getApplicationInfo(packageName, flags)
@@ -66,7 +67,7 @@ fun PackageManager.getApplicationInfoCompat(
 fun PackageManager.resolveContentProviderCompat(
     authority: String,
     flags: Int,
-) = if (BuildCompat.isAtLeastT()) {
+) = if (SDK_INT >= TIRAMISU) {
     resolveContentProvider(authority, ComponentInfoFlags.of(flags.toLong()))
 } else {
     resolveContentProvider(authority, flags)
@@ -75,7 +76,7 @@ fun PackageManager.resolveContentProviderCompat(
 @Throws(PackageManager.NameNotFoundException::class)
 fun PackageManager.getSignaturesCompat(
     packageName: String,
-) = if (BuildCompat.isAtLeastT()) {
+) = if (SDK_INT >= TIRAMISU) {
     getPackageInfo(packageName, PackageInfoFlags.of(GET_SIGNING_CERTIFICATES.toLong()))
         .signingInfo
         .let {
